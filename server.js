@@ -6,7 +6,20 @@ const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_DIR = process.env.RENDER ? '/var/data' : __dirname;
+
+function getWritableDataDir() {
+  const candidates = [process.env.RENDER_DISK_PATH || '/var/data', '/tmp', __dirname];
+  for (const dir of candidates) {
+    try {
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.accessSync(dir, fs.constants.W_OK);
+      return dir;
+    } catch (e) {}
+  }
+  return __dirname;
+}
+
+const DATA_DIR = getWritableDataDir();
 
 const log = (msg, type = 'INFO') => console.log(`[${new Date().toISOString()}] [${type}] ${msg}`);
 
@@ -40,7 +53,6 @@ db.serialize(() => {
       description TEXT,
       image_path TEXT,
       apk_link TEXT NOT NULL,
-      version TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
@@ -51,7 +63,8 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const uploadBaseUrl = process.env.RENDER ? '/var/data/public' : '/uploads';
+const uploadUrlBase = DATA_DIR === '/tmp' ? '/uploads-tmp' : '/uploads';
+app.use(uploadUrlBase === '/uploads-tmp' ? '/uploads-tmp' : '/uploads', express.static(path.join(DATA_DIR, 'public', 'uploads')));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
@@ -75,7 +88,7 @@ const upload = multer({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/apps', (req, res) => {
   db.all('SELECT * FROM apps ORDER BY created_at DESC', [], (err, rows) => {
@@ -89,7 +102,7 @@ app.post('/api/apps', upload.single('image'), (req, res) => {
   if (!name || !apk_link) {
     return res.status(400).json({ error: 'Nombre y LINK son requeridos' });
   }
-  const image_path = req.file ? '/uploads/' + req.file.filename : null;
+  const image_path = req.file ? uploadUrlBase + '/' + req.file.filename : null;
   const stmt = db.prepare('INSERT INTO apps (name, description, image_path, apk_link) VALUES (?, ?, ?, ?)');
   stmt.run(name, description || '', image_path, apk_link, function(err) {
     if (err) return res.status(500).json({ error: err.message });
@@ -103,7 +116,7 @@ app.delete('/api/apps/:id', (req, res) => {
   db.get('SELECT image_path FROM apps WHERE id = ?', [appId], (err, row) => {
     if (err) return res.status(500).json({ error: err.message });
     if (row && row.image_path) {
-      const filePath = path.join(__dirname, 'public', row.image_path);
+      const filePath = path.join(DATA_DIR, 'public', 'uploads', path.basename(row.image_path));
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
     db.run('DELETE FROM apps WHERE id = ?', [appId], (err) => {
@@ -114,5 +127,5 @@ app.delete('/api/apps/:id', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`JULITOOLS 2 corriendo en http://localhost:${PORT}`);
+  console.log(`JULITOOLS 2 corriendo en puerto ${PORT}, usando DATA_DIR: ${DATA_DIR}`);
 });
