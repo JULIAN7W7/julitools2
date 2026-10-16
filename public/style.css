@@ -68,14 +68,7 @@ header {
 #editSelected {
   width: 40px;
   padding: 0.5rem;
-  font-size: 1rem;
-}
-
-#editSelected:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--border);
+  font-size: 1.1rem;
 }
 
 .edit-card-btn {

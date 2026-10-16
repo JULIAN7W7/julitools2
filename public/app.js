@@ -70,10 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (inDeleteMode && selectedApps.length > 0) {
       createDeleteFloatingBtn();
-      editSelectedBtn.disabled = false;
     } else {
       removeDeleteFloatingBtn();
-      editSelectedBtn.disabled = true;
     }
   };
 
@@ -133,12 +131,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const isActive = document.body.classList.contains('delete-mode');
     deleteModeBtn.textContent = isActive ? 'Cancelar' : 'Eliminar App';
     selectedApps = [];
-    editSelectedBtn.disabled = true;
     removeDeleteFloatingBtn();
     fetchApps();
   });
 
   editSelectedBtn.addEventListener('click', () => {
+    if (!document.body.classList.contains('delete-mode')) {
+      document.body.classList.add('delete-mode');
+      deleteModeBtn.textContent = 'Cancelar';
+      fetchApps();
+      return;
+    }
     if (selectedApps.length === 0) return;
     const id = selectedApps[0];
     editApp(id);
