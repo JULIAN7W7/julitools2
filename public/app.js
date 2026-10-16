@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const openAdminBtn = document.getElementById('openAdmin');
   const deleteModeBtn = document.getElementById('deleteMode');
   const closeModal = document.querySelector('.close');
+  const closeWarning = document.querySelector('.close-warning');
   const appForm = document.getElementById('appForm');
   const appsList = document.getElementById('appsList');
 
@@ -76,6 +77,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   closeModal.addEventListener('click', () => {
     adminModal.classList.remove('active');
+  });
+
+  closeWarning.addEventListener('click', () => {
+    document.getElementById('warningBanner').style.display = 'none';
   });
 
   window.addEventListener('click', (e) => {
