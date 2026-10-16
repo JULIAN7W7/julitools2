@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const appsGrid = document.getElementById('appsGrid');
   const adminModal = document.getElementById('adminModal');
   const openAdminBtn = document.getElementById('openAdmin');
+  const editSelectedBtn = document.getElementById('editSelected');
   const deleteModeBtn = document.getElementById('deleteMode');
   const closeModal = document.querySelector('.close');
   const closeWarning = document.querySelector('.close-warning');
@@ -56,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
     appsGrid.innerHTML = apps.map(app => `
       <div class="app-card ${inDeleteMode ? 'selectable' : ''} ${selectedApps.includes(app.id) ? 'selected' : ''}" 
            ${inDeleteMode ? `onclick="toggleSelection(${app.id})"` : ''}>
-        ${inDeleteMode ? `<button class="edit-card-btn" onclick="editApp(${app.id})" title="Editar"><span>✎</span></button>` : ''}
         <div class="app-image">
           ${app.image_path ? `<img src="${app.image_path}" alt="${app.name}">` : app.name}
         </div>
@@ -70,8 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (inDeleteMode && selectedApps.length > 0) {
       createDeleteFloatingBtn();
+      editSelectedBtn.disabled = false;
     } else {
       removeDeleteFloatingBtn();
+      editSelectedBtn.disabled = true;
     }
   };
 
@@ -131,8 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const isActive = document.body.classList.contains('delete-mode');
     deleteModeBtn.textContent = isActive ? 'Cancelar' : 'Eliminar App';
     selectedApps = [];
+    editSelectedBtn.disabled = true;
     removeDeleteFloatingBtn();
     fetchApps();
+  });
+
+  editSelectedBtn.addEventListener('click', () => {
+    if (selectedApps.length === 0) return;
+    const id = selectedApps[0];
+    editApp(id);
   });
 
   closeModal.addEventListener('click', () => {

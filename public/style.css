@@ -65,6 +65,19 @@ header {
   gap: 0.8rem;
 }
 
+#editSelected {
+  width: 40px;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+#editSelected:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border);
+}
+
 .edit-card-btn {
   position: absolute;
   top: 0.5rem;
