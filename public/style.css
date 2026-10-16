@@ -204,12 +204,54 @@ header h1 {
   transition: all 0.2s ease;
   z-index: 10;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .delete-card-btn:hover {
   background: #ff3b30;
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(255, 59, 48, 0.5);
+}
+
+.app-card.selectable {
+  cursor: pointer;
+  filter: grayscale(100%) opacity(0.6);
+}
+
+.app-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.5);
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+#deleteFloatingBtn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  background: #ff3b30;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 28px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(255, 59, 48, 0.4);
+  transition: all 0.2s ease;
+}
+
+#deleteFloatingBtn:hover {
+  background: #ff1a00;
+  transform: scale(1.05);
+  box-shadow: 0 6px 24px rgba(255, 59, 48, 0.5);
+}
+
+.btn-delete {
+  background: #ff3b30;
+  color: white;
+  border-color: transparent;
 }
 
 .app-card:hover {
