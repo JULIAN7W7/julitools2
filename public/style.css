@@ -426,6 +426,7 @@ footer {
   margin: 0 auto;
   padding: 2rem;
   box-shadow: var(--shadow);
+  position: relative;
 }
 
 .modal h2 {
