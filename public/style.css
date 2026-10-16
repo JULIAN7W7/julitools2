@@ -62,13 +62,23 @@ header {
 
 .header-buttons {
   display: flex;
-  gap: 0.8rem;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.header-buttons .btn {
+  white-space: nowrap;
+  min-width: 44px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
 }
 
 #editSelected {
-  width: 40px;
+  width: 44px;
+  min-width: 44px;
   padding: 0.5rem;
   font-size: 1.1rem;
+  aspect-ratio: 1;
 }
 
 .edit-card-btn {
