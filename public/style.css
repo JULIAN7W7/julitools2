@@ -172,9 +172,9 @@ header h1 {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(0, 122, 255, 0.3);
   color: var(--accent);
-  padding: 0.8rem 1.8rem;
+  padding: clamp(0.6rem, 1.5vw, 0.8rem) clamp(1.2rem, 3vw, 2rem);
   border-radius: 28px;
-  font-size: 0.95rem;
+  font-size: clamp(0.8rem, 2vw, 0.95rem);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -193,6 +193,7 @@ header h1 {
   color: white;
   border-color: transparent;
   box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+  padding: clamp(0.7rem, 2vw, 0.9rem) clamp(1.2rem, 3vw, 2rem);
 }
 
 .btn-primary:hover {
