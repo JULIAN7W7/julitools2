@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: julitools2
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 20

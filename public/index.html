@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JULITOOLS 2</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="noise-overlay"></div>
+  <div class="container">
+    <header>
+      <div class="header-left">
+        <h1>JULITOOLS 2</h1>
+        <p class="subtitle">Repositorio de APKs y herramientas</p>
+      </div>
+      <div class="header-buttons">
+        <button id="openAdmin" class="btn btn-primary">Administrar apps</button>
+        <button id="deleteMode" class="btn">Eliminar App</button>
+      </div>
+    </header>
+
+    <main>
+      <div id="appsGrid" class="apps-grid">
+        <p class="loading">Cargando apps...</p>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 JULITOOLS 2</p>
+    </footer>
+  </div>
+
+  <div id="adminModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Administrar Apps</h2>
+      <form id="appForm">
+        <div class="form-group">
+          <label for="name">Nombre *</label>
+          <input type="text" id="name" name="name" required placeholder="Nombre de la app">
+        </div>
+        <div class="form-group">
+          <label for="description">Descripción</label>
+          <textarea id="description" name="description" placeholder="Breve descripción"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="apk_link">LINK *</label>
+          <input type="url" id="apk_link" name="apk_link" required placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label for="image">Imagen</label>
+          <input type="file" id="image" name="image" accept="image/*">
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar App</button>
+      </form>
+      <div id="appsList" class="apps-list"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
