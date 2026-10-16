@@ -168,8 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (res.ok) {
         appForm.reset();
-        fetchApps();
-        renderAdminApps();
+        adminModal.classList.remove('active');
+        window.location.reload();
       } else {
         alert(result.error || 'Error al subir');
       }
