@@ -65,6 +65,32 @@ header {
   gap: 0.8rem;
 }
 
+.edit-card-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 122, 255, 0.85);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  backdrop-filter: blur(5px);
+}
+
+.edit-card-btn:hover {
+  background: #0066e0;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+}
+
 header h1 {
   font-size: 2.8rem;
   font-weight: 700;

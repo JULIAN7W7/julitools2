@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const log = (msg, type = 'INFO') => console.log(`[${new Date().toISOString()}] [${type}] ${msg}`);
   const appsGrid = document.getElementById('appsGrid');
   const adminModal = document.getElementById('adminModal');
   const openAdminBtn = document.getElementById('openAdmin');
@@ -6,10 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeModal = document.querySelector('.close');
   const closeWarning = document.querySelector('.close-warning');
   const appForm = document.getElementById('appForm');
+  const formTitle = document.querySelector('#adminModal h2');
+  const submitBtn = appForm.querySelector('button[type="submit"]');
 
   let apps = [];
   let selectedApps = [];
   let deleteFloatingBtn = null;
+  let editingAppId = null;
 
   const createDeleteFloatingBtn = () => {
     if (deleteFloatingBtn) return;
@@ -34,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
       apps = await res.json();
       renderApps();
     } catch (err) {
+      log(`Error al cargar apps: ${err.message}`, 'ERROR');
       appsGrid.innerHTML = '<p class="loading">Error al cargar las apps</p>';
     }
   };
@@ -51,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     appsGrid.innerHTML = apps.map(app => `
       <div class="app-card ${inDeleteMode ? 'selectable' : ''} ${selectedApps.includes(app.id) ? 'selected' : ''}" 
            ${inDeleteMode ? `onclick="toggleSelection(${app.id})"` : ''}>
+        ${inDeleteMode ? `<button class="edit-card-btn" onclick="editApp(${app.id})" title="Editar"><span>✎</span></button>` : ''}
         <div class="app-image">
           ${app.image_path ? `<img src="${app.image_path}" alt="${app.name}">` : app.name}
         </div>
@@ -79,6 +85,23 @@ document.addEventListener('DOMContentLoaded', () => {
     renderApps();
   };
 
+  window.editApp = (id) => {
+    const app = apps.find(a => a.id === id);
+    if (!app) return;
+
+    editingAppId = id;
+    formTitle.textContent = 'Editar App';
+    submitBtn.textContent = 'Actualizar App';
+
+    document.getElementById('name').value = app.name;
+    document.getElementById('description').value = app.description || '';
+    document.getElementById('apk_link').value = app.apk_link || '';
+
+    document.getElementById('image').value = '';
+
+    adminModal.classList.add('active');
+  };
+
   const deleteSelectedApps = async () => {
     if (selectedApps.length === 0) return;
     if (!confirm(`¿Eliminar ${selectedApps.length} app(s)?`)) return;
@@ -90,11 +113,16 @@ document.addEventListener('DOMContentLoaded', () => {
       removeDeleteFloatingBtn();
       fetchApps();
     } catch (err) {
+      log(`Error al eliminar apps: ${err.message}`, 'ERROR');
       alert('Error al eliminar');
     }
   };
 
   openAdminBtn.addEventListener('click', () => {
+    editingAppId = null;
+    formTitle.textContent = 'Agregar App';
+    submitBtn.textContent = 'Guardar App';
+    appForm.reset();
     adminModal.classList.add('active');
   });
 
@@ -109,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   closeModal.addEventListener('click', () => {
     adminModal.classList.remove('active');
+    editingAppId = null;
   });
 
   closeWarning.addEventListener('click', () => {
@@ -118,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('click', (e) => {
     if (e.target === adminModal) {
       adminModal.classList.remove('active');
+      editingAppId = null;
     }
   });
 
@@ -126,20 +156,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const formData = new FormData(appForm);
 
     try {
-      const res = await fetch('/api/apps', {
-        method: 'POST',
-        body: formData
-      });
+      let res;
+      if (editingAppId) {
+        res = await fetch(`/api/apps/${editingAppId}`, {
+          method: 'PUT',
+          body: formData
+        });
+      } else {
+        res = await fetch('/api/apps', {
+          method: 'POST',
+          body: formData
+        });
+      }
       const result = await res.json();
 
       if (res.ok) {
         appForm.reset();
+        editingAppId = null;
+        formTitle.textContent = 'Agregar App';
+        submitBtn.textContent = 'Guardar App';
         adminModal.classList.remove('active');
         window.location.reload();
       } else {
         alert(result.error || 'Error al subir');
       }
     } catch (err) {
+      log(`Error al subir app: ${err.message}`, 'ERROR');
       alert('Error de conexión');
     }
   });

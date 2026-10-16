@@ -126,6 +126,36 @@ app.delete('/api/apps/:id', (req, res) => {
   });
 });
 
+app.put('/api/apps/:id', upload.single('image'), (req, res) => {
+  const appId = req.params.id;
+  const { name, description, apk_link } = req.body;
+  if (!name || !apk_link) {
+    return res.status(400).json({ error: 'Nombre y LINK son requeridos' });
+  }
+  log(`Actualizando app ${appId}: ${name}`, 'INFO');
+
+  db.get('SELECT image_path FROM apps WHERE id = ?', [appId], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!row) return res.status(404).json({ error: 'App no encontrada' });
+
+    let image_path = row.image_path;
+    if (req.file) {
+      if (row.image_path) {
+        const oldFile = path.join(DATA_DIR, 'public', 'uploads', path.basename(row.image_path));
+        if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+      }
+      image_path = uploadUrlBase + '/' + req.file.filename;
+    }
+
+    const stmt = db.prepare('UPDATE apps SET name = ?, description = ?, image_path = ?, apk_link = ? WHERE id = ?');
+    stmt.run(name, description || '', image_path, apk_link, appId, function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: appId, name, description, image_path, apk_link });
+    });
+    stmt.finalize();
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`JULITOOLS 2 corriendo en puerto ${PORT}, usando DATA_DIR: ${DATA_DIR}`);
 });
