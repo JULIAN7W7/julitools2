@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeModal = document.querySelector('.close');
   const closeWarning = document.querySelector('.close-warning');
   const appForm = document.getElementById('appForm');
-  const appsList = document.getElementById('appsList');
 
   let apps = [];
   let selectedApps = [];
@@ -35,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
       apps = await res.json();
       renderApps();
     } catch (err) {
-      log(`Error al cargar apps: ${err.message}`, 'ERROR');
       appsGrid.innerHTML = '<p class="loading">Error al cargar las apps</p>';
     }
   };
@@ -71,24 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const renderAdminApps = () => {
-    if (apps.length === 0) {
-      appsList.innerHTML = '<p style="color: var(--text-secondary);">No hay apps registradas</p>';
-      return;
-    }
-
-    appsList.innerHTML = apps.map(app => `
-      <div class="admin-app-item">
-        ${app.image_path ? `<img src="${app.image_path}" alt="${app.name}">` : '<div style="width:48px;height:48px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--text-secondary);">Sin imagen</div>'}
-        <div class="admin-app-info">
-          <h4>${app.name}</h4>
-          <p>${app.apk_link}</p>
-        </div>
-        <button class="delete-btn" onclick="deleteApp(${app.id})">Eliminar</button>
-      </div>
-    `).join('');
-  };
-
   window.toggleSelection = (id) => {
     const idx = selectedApps.indexOf(id);
     if (idx > -1) {
@@ -97,20 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedApps.push(id);
     }
     renderApps();
-  };
-
-  window.deleteApp = async (id) => {
-    if (!confirm('¿Estás seguro de eliminar esta app?')) return;
-    try {
-      const res = await fetch(`/api/apps/${id}`, { method: 'DELETE' });
-      if (res.ok) fetchApps(); else alert('Error al eliminar');
-    } catch (err) {
-      log(`Error al eliminar app ${id}: ${err.message}`, 'ERROR');
-      alert('Error de conexión');
-    }
-    if (document.body.classList.contains('delete-mode')) {
-      renderAdminApps();
-    }
   };
 
   const deleteSelectedApps = async () => {
@@ -123,9 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedApps = [];
       removeDeleteFloatingBtn();
       fetchApps();
-      renderAdminApps();
     } catch (err) {
-      log(`Error al eliminar apps seleccionadas: ${err.message}`, 'ERROR');
       alert('Error al eliminar');
     }
   };
@@ -138,6 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.toggle('delete-mode');
     const isActive = document.body.classList.contains('delete-mode');
     deleteModeBtn.textContent = isActive ? 'Cancelar' : 'Eliminar App';
+    selectedApps = [];
+    removeDeleteFloatingBtn();
     fetchApps();
   });
 
@@ -174,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(result.error || 'Error al subir');
       }
     } catch (err) {
-      log(`Error al subir app: ${err.message}`, 'ERROR');
       alert('Error de conexión');
     }
   });
